@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<paths>
+    <!-- 应用内部 cache（context.cacheDir） -->
+    <cache-path
+        name="cache"
+        path="." />
+    <!-- 应用外部 cache（context.externalCacheDir，Android 5+ 推荐） -->
+    <external-cache-path
+        name="external_cache"
+        path="." />
+    <!-- 应用专属外部存储（context.externalFilesDir） -->
+    <external-files-path
+        name="external_files"
+        path="." />
+    <!-- 公共下载目录（兜底用） -->
+    <external-path
+        name="external"
+        path="." />
+</paths>

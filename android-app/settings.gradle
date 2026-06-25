@@ -1,0 +1,3 @@
+// 项目级 build.gradle
+rootProject.name = "VehicleManagement"
+include ':app'

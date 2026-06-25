@@ -1,0 +1,62 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+env/
+.env
+.env.local
+*.egg-info/
+.pytest_cache/
+
+# Node
+node_modules/
+.npm
+.eslintcache
+.pnp
+.pnp.js
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+logs/
+
+# Database
+*.db
+*.sqlite
+*.sqlite3
+
+# Docker
+docker-compose.override.yml
+
+# ====== 版本快照相关 ======
+# 开发过程临时产物（zip / b64 / 测试图片 / 临时脚本）—— 不进 git
+versions/_artifacts/
+
+# 版本快照内的构建产物（避免冗余）
+versions/v*/**/dist/
+versions/v*/**/__pycache__/
+versions/v*/**/node_modules/
+versions/v*/**/.env
+
+# 当前开发版本如果不想 commit 构建产物
+backend/__pycache__/
+frontend/dist/
+frontend/node_modules/
+
+# Android build 产物（build.gradle 输出）
+android-app/app/build/
+android-app/.gradle/
+android-app/.idea/
+android-app/local.properties
+android-app/captures/
+android-app/*.iml

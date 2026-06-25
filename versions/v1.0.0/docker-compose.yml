@@ -1,0 +1,81 @@
+# 厂区车辆管理系统 - Docker Compose
+# 一键启动：数据库 + 后端 + 前端
+
+version: '3.8'
+
+services:
+  # ========== MariaDB 数据库 ==========
+  db:
+    image: mariadb:10.11
+    container_name: vehicle-db
+    restart: unless-stopped
+    environment:
+      MARIADB_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:-root123}
+      MARIADB_DATABASE: ${DB_NAME:-vehicle_mgmt}
+      MARIADB_USER: ${DB_USER:-vehicle}
+      MARIADB_PASSWORD: ${DB_PASSWORD:-vehicle123}
+      TZ: Asia/Shanghai
+    volumes:
+      - db_data:/var/lib/mysql
+      - ./deploy/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    ports:
+      - "3306:3306"
+    networks:
+      - vehicle-net
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ========== 后端 FastAPI ==========
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: vehicle-backend
+    restart: unless-stopped
+    environment:
+      DB_HOST: db
+      DB_PORT: 3306
+      DB_NAME: ${DB_NAME:-vehicle_mgmt}
+      DB_USER: ${DB_USER:-vehicle}
+      DB_PASSWORD: ${DB_PASSWORD:-vehicle123}
+      JWT_SECRET: ${JWT_SECRET:-change-me-in-production-please}
+      PHOTO_BASE_DIR: /photos
+      TZ: Asia/Shanghai
+    volumes:
+      - photos_data:/photos  # 照片持久化
+    ports:
+      - "8000:8000"
+    networks:
+      - vehicle-net
+    depends_on:
+      db:
+        condition: service_healthy
+
+  # ========== 前端 Vue 3 ==========
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      args:
+        VITE_API_BASE: /api
+    container_name: vehicle-frontend
+    restart: unless-stopped
+    ports:
+      - "8080:80"
+    networks:
+      - vehicle-net
+    depends_on:
+      - backend
+
+volumes:
+  db_data:
+    driver: local
+  photos_data:
+    driver: local
+
+networks:
+  vehicle-net:
+    driver: bridge

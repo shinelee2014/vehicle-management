@@ -1,0 +1,44 @@
+server {
+  listen 80;
+  server_name _;
+  client_max_body_size 20M;
+
+  root /usr/share/nginx/html;
+  index index.html;
+
+  # CORS preflight - handle OPTIONS directly, don't proxy to backend
+  location /api/ {
+    # Handle OPTIONS preflight request
+    if ($request_method = 'OPTIONS') {
+      add_header Access-Control-Allow-Origin *;
+      add_header Access-Control-Allow-Methods GET, POST, PUT, DELETE, PATCH, OPTIONS;
+      add_header Access-Control-Allow-Headers DNT, User-Agent, Fetch-Asset, Content-Type, Authorization, X-Requested-With, accept, origin, cache-control;
+      add_header Access-Control-Allow-Credentials true;
+      add_header Access-Control-Max-Age 1728000;
+      add_header Content-Type text/plain charset=utf-8;
+      add_header Content-Length 0;
+      return 204;
+    }
+
+    # Normal requests proxy to backend
+    proxy_pass http://backend:8000;
+    proxy_http_version 1.1;
+    proxy_set_header Host $host;
+    proxy_set_header X-Real-IP $remote_addr;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_set_header X-Forwarded-Proto $scheme;
+  }
+
+  # Photos proxy
+  location /photos/ {
+    proxy_pass http://backend:8000;
+    proxy_http_version 1.1;
+    proxy_set_header Host $host;
+    proxy_set_header X-Real-IP $remote_addr;
+  }
+
+  # Frontend SPA routing
+  location / {
+    try_files $uri $uri/ /index.html;
+  }
+}
