@@ -26,13 +26,23 @@ async def get_stats(
     # 今日进场
     today_in = (
         db.query(func.count(Record.id))
-        .filter(Record.direction == Direction.IN, Record.in_time >= today_start, Record.in_time < today_end)
+        .filter(
+            Record.direction == Direction.IN,
+            Record.in_time >= today_start,
+            Record.in_time < today_end,
+            Record.is_deleted == False,
+        )
         .scalar() or 0
     )
     # 今日出场
     today_out = (
         db.query(func.count(Record.id))
-        .filter(Record.direction == Direction.OUT, Record.out_time >= today_start, Record.out_time < today_end)
+        .filter(
+            Record.direction == Direction.OUT,
+            Record.out_time >= today_start,
+            Record.out_time < today_end,
+            Record.is_deleted == False,
+        )
         .scalar() or 0
     )
     # 今日货车
@@ -42,6 +52,7 @@ async def get_stats(
             Record.vehicle_type == VehicleType.TRUCK,
             Record.in_time >= today_start,
             Record.in_time < today_end,
+            Record.is_deleted == False,
         )
         .scalar() or 0
     )
@@ -52,13 +63,18 @@ async def get_stats(
             Record.direction == Direction.IN,
             Record.approval_status.in_([ApprovalStatus.APPROVED, ApprovalStatus.TIMEOUT]),
             Record.companion_id.is_(None),
+            Record.is_deleted == False,
         )
         .scalar() or 0
     )
     # 待我审批
     pending_me = (
         db.query(func.count(Record.id))
-        .filter(Record.approver_id == current_user.id, Record.approval_status == ApprovalStatus.PENDING)
+        .filter(
+            Record.approver_id == current_user.id,
+            Record.approval_status == ApprovalStatus.PENDING,
+            Record.is_deleted == False,
+        )
         .scalar() or 0
     )
 
@@ -69,7 +85,11 @@ async def get_stats(
             func.date(Record.in_time).label("date"),
             func.count(Record.id).label("count"),
         )
-        .filter(Record.in_time >= seven_days_ago, Record.direction == Direction.IN)
+        .filter(
+            Record.in_time >= seven_days_ago,
+            Record.direction == Direction.IN,
+            Record.is_deleted == False,
+        )
         .group_by(func.date(Record.in_time))
         .all()
     )

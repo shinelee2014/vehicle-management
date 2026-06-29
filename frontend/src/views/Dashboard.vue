@@ -8,21 +8,21 @@
     <!-- 统计卡片 -->
     <div class="stat-cards">
       <div class="stat-card">
-        <div class="icon" style="background: #409eff"><el-icon><TopRight /></el-icon></div>
+        <div class="icon" style="background: #67c23a"><el-icon><TopRight /></el-icon></div>
         <div>
           <div class="value">{{ stats.today_in }}</div>
           <div class="label">今日进场</div>
         </div>
       </div>
       <div class="stat-card">
-        <div class="icon" style="background: #67c23a"><el-icon><BottomRight /></el-icon></div>
+        <div class="icon" style="background: #e6a23c"><el-icon><BottomRight /></el-icon></div>
         <div>
           <div class="value">{{ stats.today_out }}</div>
           <div class="label">今日出场</div>
         </div>
       </div>
       <div class="stat-card">
-        <div class="icon" style="background: #e6a23c"><el-icon><Van /></el-icon></div>
+        <div class="icon" style="background: #409eff"><el-icon><Van /></el-icon></div>
         <div>
           <div class="value">{{ stats.today_truck }}</div>
           <div class="label">今日货车</div>
