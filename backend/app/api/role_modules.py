@@ -8,7 +8,7 @@ from fastapi import APIRouter, Depends, HTTPException, Request
 from sqlalchemy.orm import Session
 
 from app.database import get_db
-from app.core.permissions import get_current_user
+from app.core.permissions import get_current_user, check_permission
 from app.models.user import User, UserRole
 from app.models.role_module import RoleModule, DEFAULT_ROLE_MODULES
 from app.models.module import Module
@@ -17,8 +17,8 @@ from app.services.audit import log_audit
 router = APIRouter()
 
 
-def _require_admin(current_user: User):
-    if current_user.role != UserRole.ADMIN.value:
+def _require_admin(current_user: User, db: Session):
+    if not check_permission(db, current_user, "admin_role_modules"):
         raise HTTPException(status_code=403, detail={"code": 403, "message": "仅管理员可访问"})
 
 
@@ -38,7 +38,7 @@ async def list_role_modules(
     db: Session = Depends(get_db),
 ):
     """列出全部角色的可见模块（仅管理员）"""
-    _require_admin(current_user)
+    _require_admin(current_user, db)
     items = db.query(RoleModule).order_by(RoleModule.role).all()
     # 没配置的角色也返回默认值（方便前端展示）
     rows = {r.role: r.to_dict() for r in items}
@@ -57,7 +57,7 @@ async def update_role_modules(
     db: Session = Depends(get_db),
 ):
     """更新某角色的可见模块（仅管理员）"""
-    _require_admin(current_user)
+    _require_admin(current_user, db)
     if role not in DEFAULT_ROLE_MODULES:
         raise HTTPException(status_code=400, detail={"code": 400, "message": f"未知角色: {role}"})
 
@@ -82,8 +82,8 @@ async def update_role_modules(
 
     log_audit(
         db, user_id=current_user.id, username=current_user.username,
-        action="update_role_modules", target_type="role_module", target_id=role,
-        details={"modules": modules},
+        action="update_role_modules", target_type="role_module", target_id=None,
+        details={"role": role, "modules": modules},
         ip_address=request.client.host if request.client else "",
     )
     db.commit()

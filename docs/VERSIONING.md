@@ -235,7 +235,7 @@ main 分支 ─ 稳定可发布
 
 ```bash
 # 1. SSH 到 NAS
-ssh admin@192.168.6.12
+ssh admin@192.168.1.100
 
 # 2. 停当前服务
 cd /volume1/docker/vehicle-management

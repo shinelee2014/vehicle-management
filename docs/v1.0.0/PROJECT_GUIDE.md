@@ -2,7 +2,7 @@
 
 **版本**：v1.0.0  
 **发布日期**：2026-06-25  
-**部署目标**：Synology NAS（DS1621+，内网 192.168.6.12）  
+**部署目标**：Synology NAS（DS1621+，内网 192.168.1.100）  
 **技术栈**：FastAPI · Vue 3 · MariaDB · Docker · APScheduler
 
 ---
@@ -348,7 +348,7 @@ curl http://localhost:8080/health
 
 - **项目所有者**：CEO 秘书 / IT 管理员（用户）
 - **开发协助**：Mavis AI 助手（通过 `docs/VERSIONING.md` 走迭代流程）
-- **紧急支持**：SSH 登录 NAS（`admin@192.168.6.12`）+ `cd /volume1/docker/vehicle-management && docker-compose logs`
+- **紧急支持**：SSH 登录 NAS（`admin@192.168.1.100`）+ `cd /volume1/docker/vehicle-management && docker-compose logs`
 
 ---
 

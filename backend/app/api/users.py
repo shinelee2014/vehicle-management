@@ -8,7 +8,7 @@ from typing import Optional
 
 from app.database import get_db
 from app.core.security import hash_password
-from app.core.permissions import get_current_user
+from app.core.permissions import get_current_user, check_permission
 from app.models.user import User, UserRole
 from app.schemas.user import UserCreate, UserUpdate, PasswordReset
 from app.services.audit import log_audit
@@ -26,10 +26,13 @@ async def list_users(
     db: Session = Depends(get_db),
 ):
     """用户列表（仅管理员）"""
-    if current_user.role != UserRole.ADMIN.value:
+    if not check_permission(db, current_user, "admin_users"):
         raise HTTPException(status_code=403, detail={"code": 403, "message": "无权限"})
 
     query = db.query(User)
+    # 越权过滤：非管理员用户在用户列表中无法看到超级管理员
+    if current_user.role != UserRole.ADMIN.value:
+        query = query.filter(User.role != UserRole.ADMIN.value)
     if keyword:
         query = query.filter(or_(
             User.username.like(f"%{keyword}%"),
@@ -61,7 +64,7 @@ async def create_user(
     db: Session = Depends(get_db),
 ):
     """创建用户（仅管理员）"""
-    if current_user.role != UserRole.ADMIN.value:
+    if not check_permission(db, current_user, "admin_users"):
         raise HTTPException(status_code=403, detail={"code": 403, "message": "无权限"})
 
     if db.query(User).filter(User.username == req.username).first():
@@ -96,12 +99,16 @@ async def update_user(
     db: Session = Depends(get_db),
 ):
     """更新用户（仅管理员）"""
-    if current_user.role != UserRole.ADMIN.value:
+    if not check_permission(db, current_user, "admin_users"):
         raise HTTPException(status_code=403, detail={"code": 403, "message": "无权限"})
 
     user = db.query(User).filter(User.id == user_id).first()
     if not user:
         raise HTTPException(status_code=404, detail={"code": 404, "message": "用户不存在"})
+
+    # 越权防护：非 admin 角色无权修改管理员账号
+    if user.role == UserRole.ADMIN.value and current_user.role != UserRole.ADMIN.value:
+        raise HTTPException(status_code=403, detail={"code": 403, "message": "无权操作管理员用户"})
 
     if req.real_name is not None:
         user.real_name = req.real_name
@@ -132,7 +139,7 @@ async def delete_user(
     db: Session = Depends(get_db),
 ):
     """软删除用户（仅管理员）"""
-    if current_user.role != UserRole.ADMIN.value:
+    if not check_permission(db, current_user, "admin_users"):
         raise HTTPException(status_code=403, detail={"code": 403, "message": "无权限"})
 
     if user_id == current_user.id:
@@ -141,6 +148,10 @@ async def delete_user(
     user = db.query(User).filter(User.id == user_id).first()
     if not user:
         raise HTTPException(status_code=404, detail={"code": 404, "message": "用户不存在"})
+
+    # 越权防护：非 admin 角色无权删除管理员账号
+    if user.role == UserRole.ADMIN.value and current_user.role != UserRole.ADMIN.value:
+        raise HTTPException(status_code=403, detail={"code": 403, "message": "无权操作管理员用户"})
 
     user.is_active = False
     log_audit(db, user_id=current_user.id, username=current_user.username, action="delete_user",
@@ -158,12 +169,16 @@ async def reset_password(
     db: Session = Depends(get_db),
 ):
     """重置密码（仅管理员）"""
-    if current_user.role != UserRole.ADMIN.value:
+    if not check_permission(db, current_user, "admin_users"):
         raise HTTPException(status_code=403, detail={"code": 403, "message": "无权限"})
 
     user = db.query(User).filter(User.id == user_id).first()
     if not user:
         raise HTTPException(status_code=404, detail={"code": 404, "message": "用户不存在"})
+
+    # 越权防护：非 admin 角色无权重置管理员密码
+    if user.role == UserRole.ADMIN.value and current_user.role != UserRole.ADMIN.value:
+        raise HTTPException(status_code=403, detail={"code": 403, "message": "无权操作管理员用户"})
 
     user.password_hash = hash_password(req.new_password)
     log_audit(db, user_id=current_user.id, username=current_user.username, action="reset_password",

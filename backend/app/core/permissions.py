@@ -62,3 +62,18 @@ def require_roles(*allowed_roles: str):
             return await func(*args, **kwargs)
         return wrapper
     return decorator
+
+
+def check_permission(db: Session, user: User, module_code: str) -> bool:
+    """动态检查用户是否有某个模块的权限（内置/自定义菜单）"""
+    role_str = user.role.value if hasattr(user.role, "value") else user.role
+    if role_str == "admin":
+        return True
+
+    from app.models.role_module import resolve_role_modules
+    from app.models.module import Module
+
+    all_codes = [m.code for m in db.query(Module).filter(Module.is_active == True).all()]
+    visible = resolve_role_modules(db, role_str, all_codes)
+    return module_code in visible
+

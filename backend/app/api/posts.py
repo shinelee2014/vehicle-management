@@ -7,7 +7,7 @@ from typing import Optional
 from pydantic import BaseModel
 
 from app.database import get_db
-from app.core.permissions import get_current_user
+from app.core.permissions import get_current_user, check_permission
 from app.models.user import User, UserRole
 from app.models.post import Post
 from app.services.audit import log_audit
@@ -50,7 +50,7 @@ async def create_post(
     db: Session = Depends(get_db),
 ):
     """创建岗亭（仅管理员）"""
-    if current_user.role != UserRole.ADMIN.value:
+    if not check_permission(db, current_user, "admin_posts"):
         raise HTTPException(status_code=403, detail={"code": 403, "message": "无权限"})
 
     if db.query(Post).filter(Post.name == req.name).first():
@@ -74,7 +74,7 @@ async def update_post(
     db: Session = Depends(get_db),
 ):
     """更新岗亭（仅管理员）"""
-    if current_user.role != UserRole.ADMIN.value:
+    if not check_permission(db, current_user, "admin_posts"):
         raise HTTPException(status_code=403, detail={"code": 403, "message": "无权限"})
 
     post = db.query(Post).filter(Post.id == post_id).first()
@@ -101,7 +101,7 @@ async def delete_post(
     db: Session = Depends(get_db),
 ):
     """删除岗亭（仅管理员，软删）"""
-    if current_user.role != UserRole.ADMIN.value:
+    if not check_permission(db, current_user, "admin_posts"):
         raise HTTPException(status_code=403, detail={"code": 403, "message": "无权限"})
 
     post = db.query(Post).filter(Post.id == post_id).first()

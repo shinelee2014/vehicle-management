@@ -71,6 +71,12 @@ async def create_in(
     db: Session = Depends(get_db),
 ):
     """提交进场登记"""
+    # 检查车辆类型是否合法且启用
+    from app.models.vehicle_type import VehicleType
+    vt = db.query(VehicleType).filter(VehicleType.code == req.vehicle_type, VehicleType.is_active == True).first()
+    if not vt:
+        raise HTTPException(status_code=400, detail={"code": 400, "message": f"未知的车辆类型或该车型已被禁用: {req.vehicle_type}"})
+
     # 检查审批人
     approver = db.query(User).filter(User.id == req.approver_id, User.is_approver == True, User.is_active == True).first()
     if not approver:

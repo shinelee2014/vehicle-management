@@ -51,7 +51,7 @@ vehicle-management/
 
 ### 用户（浏览器访问）
 
-打开浏览器访问：`http://192.168.6.12:8080`
+打开浏览器访问：`http://192.168.1.100:8080`
 
 默认账号：
 | 账号 | 密码 | 角色 |
@@ -87,7 +87,7 @@ vehicle-management/
 | 鉴权 | JWT (HS256) + bcrypt |
 | 反向代理 | nginx (alpine) |
 | 部署 | Docker Compose（3 服务） |
-| 目标环境 | Synology NAS DS1621+ (192.168.6.12) |
+| 目标环境 | Synology NAS DS1621+ (192.168.1.100) |
 
 ## 📜 版本
 
@@ -97,4 +97,4 @@ vehicle-management/
 
 ---
 
-**内部使用 · YUSEI**
+**内部使用**

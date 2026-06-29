@@ -18,7 +18,7 @@
         </el-button>
       </el-form>
       <div class="login-footer">
-        <p class="version">v1.0.0 · YUSEI</p>
+        <p class="version">v1.0.0</p>
       </div>
     </div>
   </div>

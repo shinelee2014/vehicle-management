@@ -36,7 +36,7 @@ def handle_pending_approvals(db: Session) -> int:
             r.approval_time = datetime.utcnow()
             r.approval_remark = f"系统：{timeout_minutes} 分钟未审批，自动通过"
             # 更新 status
-            if r.direction.value == "in":
+            if r.direction == "in":
                 r.status = RecordStatus.IN_TIMEOUT
             else:
                 r.status = RecordStatus.OUT_TIMEOUT
@@ -44,7 +44,7 @@ def handle_pending_approvals(db: Session) -> int:
             r.approval_status = ApprovalStatus.TIMEOUT
             r.approval_time = datetime.utcnow()
             r.approval_remark = f"系统：{timeout_minutes} 分钟未审批，自动驳回"
-            if r.direction.value == "in":
+            if r.direction == "in":
                 r.status = RecordStatus.IN_TIMEOUT
             else:
                 r.status = RecordStatus.OUT_TIMEOUT

@@ -21,7 +21,7 @@
 
 ### 1.3 网络
 
-- NAS 固定 IP（推荐 `192.168.6.12`）
+- NAS 固定 IP（推荐 `192.168.1.100`）
 - 客户端与 NAS 同网段
 
 ---
@@ -32,7 +32,7 @@
 
 ```bash
 # SSH 到 NAS
-ssh admin@192.168.6.12
+ssh admin@192.168.1.100
 
 # 创建目录
 sudo mkdir -p /volume1/docker/vehicle-management
@@ -52,7 +52,7 @@ git clone <repo-url> .
 
 ```powershell
 # Windows 本地
-scp -r C:\path\to\vehicle-management admin@192.168.6.12:/volume1/docker/
+scp -r C:\path\to\vehicle-management admin@192.168.1.100:/volume1/docker/
 ```
 
 ### 2.3 配置环境变量
@@ -140,7 +140,7 @@ curl -X POST http://localhost:8080/api/v1/auth/login \
 
 ### 2.6 浏览器访问
 
-打开 `http://192.168.6.12:8080`
+打开 `http://192.168.1.100:8080`
 
 默认账号：
 - `admin / admin123` （管理员）
@@ -395,7 +395,7 @@ docker-compose up -d
 
 ```nginx
 # nginx.conf 加 server 配置，只监听内网 IP
-listen 192.168.6.12:8080 default_server;
+listen 192.168.1.100:8080 default_server;
 # 或加白名单
 allow 192.168.6.0/24;
 deny all;
@@ -410,7 +410,7 @@ deny all;
 
 # 简单方案：用 DSM 自带的反向代理 + Let's Encrypt 证书
 # DSM → 控制面板 → 登录门户 → 高级 → 反向代理服务器
-# 添加：来源 https://vehicle.your-domain.com 目的地 http://192.168.6.12:8080
+# 添加：来源 https://vehicle.your-domain.com 目的地 http://192.168.1.100:8080
 ```
 
 ### 7.3 定期改密码

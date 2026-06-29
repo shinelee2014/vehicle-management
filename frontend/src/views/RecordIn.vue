@@ -19,9 +19,9 @@
 
         <el-form-item label="车辆类型" prop="vehicle_type">
           <el-radio-group v-model="form.vehicle_type" size="large">
-            <el-radio-button value="internal">内部车</el-radio-button>
-            <el-radio-button value="external">外部车</el-radio-button>
-            <el-radio-button value="truck">货车</el-radio-button>
+            <el-radio-button v-for="item in vehicleTypes" :key="item.code" :value="item.code">
+              {{ item.name }}
+            </el-radio-button>
           </el-radio-group>
         </el-form-item>
 
@@ -116,8 +116,9 @@ import { ref, reactive, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { Camera } from '@element-plus/icons-vue'
-import { listPostsApi, listApproversApi, uploadPhotoApi } from '@/api'
+import { listPostsApi, listApproversApi } from '@/api'
 import { createInApi } from '@/api/records'
+import { listActiveVehicleTypesApi } from '@/api/vehicle_types'
 import { isAndroidApp, takePhotoNative, uploadPhotoNative } from '@/utils/nativeCamera'
 
 const isAndroid = isAndroidApp()
@@ -127,6 +128,7 @@ const formRef = ref()
 const submitting = ref(false)
 const posts = ref([])
 const approvers = ref([])
+const vehicleTypes = ref([])
 const frontFiles = ref([])
 const plateFiles = ref([])
 
@@ -270,11 +272,30 @@ async function onSubmit() {
 }
 
 onMounted(async () => {
-  const [p, a] = await Promise.all([listPostsApi(), listApproversApi()])
+  const [p, a, vt] = await Promise.all([
+    listPostsApi(),
+    listApproversApi(),
+    listActiveVehicleTypesApi()
+  ])
   posts.value = p.data || []
   approvers.value = a.data || []
+  vehicleTypes.value = vt.data || []
+  
+  // 按照货车排在第一个的规则进行重新排序
+  const truckIndex = vehicleTypes.value.findIndex(item => item.code === 'truck')
+  if (truckIndex > -1) {
+    const truckItem = vehicleTypes.value.splice(truckIndex, 1)[0]
+    vehicleTypes.value.unshift(truckItem)
+  }
+  
   // 默认选中第一个岗亭
   if (posts.value.length > 0) form.post_id = posts.value[0].id
+  
+  // 默认选中“货车”
+  if (vehicleTypes.value.length > 0) {
+    const truckItem = vehicleTypes.value.find(item => item.code === 'truck')
+    form.vehicle_type = truckItem ? 'truck' : vehicleTypes.value[0].code
+  }
 })
 </script>
 

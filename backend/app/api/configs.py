@@ -7,7 +7,7 @@ from pydantic import BaseModel
 from typing import Optional
 
 from app.database import get_db
-from app.core.permissions import get_current_user
+from app.core.permissions import get_current_user, check_permission
 from app.models.user import User, UserRole
 from app.models.config import SystemConfig
 
@@ -30,7 +30,7 @@ async def list_configs(
     db: Session = Depends(get_db),
 ):
     """获取所有配置（仅管理员）"""
-    if current_user.role != UserRole.ADMIN.value:
+    if not check_permission(db, current_user, "admin_configs"):
         raise HTTPException(status_code=403, detail={"code": 403, "message": "无权限"})
 
     items = db.query(SystemConfig).order_by(SystemConfig.config_key).all()
@@ -49,7 +49,7 @@ async def update_config(
     db: Session = Depends(get_db),
 ):
     """更新配置（仅管理员）"""
-    if current_user.role != UserRole.ADMIN.value:
+    if not check_permission(db, current_user, "admin_configs"):
         raise HTTPException(status_code=403, detail={"code": 403, "message": "无权限"})
 
     config = db.query(SystemConfig).filter(SystemConfig.config_key == key).first()

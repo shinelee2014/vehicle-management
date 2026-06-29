@@ -60,3 +60,8 @@ android-app/.idea/
 android-app/local.properties
 android-app/captures/
 android-app/*.iml
+
+# Antigravity Agent Spec & Local memory logs
+project.md
+memory.md
+

@@ -14,7 +14,7 @@
 - [ ] NAS 内存 ≥ 4GB（推荐 8GB+）
 
 ### 网络确认
-- [ ] 记录 NAS 内网 IP（如 `192.168.6.12`）
+- [ ] 记录 NAS 内网 IP（如 `192.168.1.100`）
 - [ ] 厂区内网互通正常
 - [ ] 厂区电脑/手机能访问该 IP
 
@@ -44,13 +44,13 @@
 
 ```bash
 # Windows PowerShell 用 scp 或者 WinSCP 工具
-scp -r C:\Users\L\.minimax-agent-cn\projects\vehicle-management admin@192.168.6.12:/volume1/docker/
+scp -r C:\Users\L\.minimax-agent-cn\projects\vehicle-management admin@192.168.1.100:/volume1/docker/
 ```
 
 #### 方式 B：SMB 共享上传
 
 1. DSM → **控制面板** → **共享文件夹** → 新建 `docker` 文件夹
-2. 在电脑上访问 `\\192.168.6.12\docker`
+2. 在电脑上访问 `\\192.168.1.100\docker`
 3. 把 `vehicle-management` 文件夹拖进去
 
 #### 方式 C：Git 拉取（最优雅）
@@ -125,7 +125,7 @@ INFO:     Uvicorn running on http://0.0.0.0:8000
 sudo docker-compose ps
 
 # 健康检查
-curl http://192.168.6.12:8000/health
+curl http://192.168.1.100:8000/health
 # 应返回：{"code":0,"message":"ok","data":{"status":"healthy"}}
 ```
 
@@ -133,7 +133,7 @@ curl http://192.168.6.12:8000/health
 
 ### 第七步：配置 NAS 反向代理（可选）
 
-如果想让用户用 `http://192.168.6.12:8080` 访问：
+如果想让用户用 `http://192.168.1.100:8080` 访问：
 
 1. DSM → **控制面板** → **登录门户** → **高级** → **反向代理服务器**
 2. 新增：
@@ -141,7 +141,7 @@ curl http://192.168.6.12:8000/health
    - 目的地：协议 HTTP、端口 `8080`、主机名 `localhost`
 3. 保存
 
-或者直接用 `http://192.168.6.12:8080` 访问即可（推荐，简单）。
+或者直接用 `http://192.168.1.100:8080` 访问即可（推荐，简单）。
 
 ---
 
@@ -261,7 +261,7 @@ max_overflow=30,  # 默认 20
 ## 🎯 部署完成检查清单
 
 - [ ] 后端 `/health` 返回 healthy
-- [ ] 前端可以打开（`http://192.168.6.12:8080`）
+- [ ] 前端可以打开（`http://192.168.1.100:8080`）
 - [ ] 用 `admin / admin123` 能登录
 - [ ] 创建一条测试进场记录
 - [ ] 审批流程跑通

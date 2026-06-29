@@ -48,7 +48,7 @@
 - **后端**：FastAPI + SQLAlchemy 2.0 + Pydantic + APScheduler + Pillow + python-jose + passlib
 - **数据库**：MariaDB 10.11（utf8mb4）
 - **部署**：Docker Compose（3 服务：db / backend / frontend）
-- **目标环境**：Synology NAS DS1621+ (192.168.6.12:8080)
+- **目标环境**：Synology NAS DS1621+ (192.168.1.100:8080)
 
 ### 文档
 

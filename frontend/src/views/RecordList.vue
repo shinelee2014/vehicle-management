@@ -40,9 +40,7 @@
         </el-form-item>
         <el-form-item label="类型">
           <el-select v-model="filters.vehicle_type" placeholder="全部" clearable style="width: 120px;">
-            <el-option label="内部车" value="internal" />
-            <el-option label="外部车" value="external" />
-            <el-option label="货车" value="truck" />
+            <el-option v-for="item in vehicleTypes" :key="item.code" :label="item.name" :value="item.code" />
           </el-select>
         </el-form-item>
         <el-form-item label="状态">
@@ -192,6 +190,7 @@ import dayjs from 'dayjs'
 import { useAuthStore } from '@/stores/auth'
 import { listPostsApi } from '@/api'
 import { listRecordsApi, exportExcelApi, batchDeleteRecordsApi, restoreRecordApi } from '@/api/records'
+import { listActiveVehicleTypesApi } from '@/api/vehicle_types'
 
 const router = useRouter()
 const authStore = useAuthStore()
@@ -202,6 +201,7 @@ const exporting = ref(false)
 const restoring = ref(false)
 const deleting = ref(false)
 const posts = ref([])
+const vehicleTypes = ref([])
 const dateRange = ref([])
 const selectedIds = ref([])
 const showDeleted = ref(false)
@@ -231,7 +231,10 @@ const hasLocked = computed(() =>
 function postName(id) {
   return posts.value.find(p => p.id === id)?.name || '-'
 }
-function typeLabel(t) { return { internal: '内部车', external: '外部车', truck: '货车' }[t] || t }
+function typeLabel(t) {
+  const found = vehicleTypes.value.find(item => item.code === t)
+  return found ? found.name : t
+}
 function typeTagType(t) { return { internal: 'info', external: '', truck: 'warning' }[t] || '' }
 function statusLabel(s) { return { pending: '待审批', approved: '已通过', rejected: '已驳回', timeout: '已超时' }[s] || s }
 function statusTagType(s) { return { pending: 'warning', approved: 'success', rejected: 'danger', timeout: 'info' }[s] || '' }
@@ -375,8 +378,9 @@ async function onBatchRestore() {
 }
 
 onMounted(async () => {
-  const p = await listPostsApi()
+  const [p, vt] = await Promise.all([listPostsApi(), listActiveVehicleTypesApi()])
   posts.value = p.data || []
+  vehicleTypes.value = vt.data || []
   loadData()
 })
 </script>

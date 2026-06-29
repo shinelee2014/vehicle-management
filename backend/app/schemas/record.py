@@ -15,7 +15,7 @@ class PhotoItem(BaseModel):
 class RecordCreateIn(BaseModel):
     """进场登记"""
     plate_number: str = Field(..., max_length=20)
-    vehicle_type: Literal["internal", "external", "truck"]
+    vehicle_type: str = Field(..., max_length=50)
     post_id: int
     approver_id: int
     in_remark: Optional[str] = None
@@ -45,7 +45,7 @@ class RecordQuery(BaseModel):
     page_size: int = 20
     plate_number: Optional[str] = None
     post_id: Optional[int] = None
-    vehicle_type: Optional[Literal["internal", "external", "truck"]] = None
+    vehicle_type: Optional[str] = None
     approval_status: Optional[Literal["pending", "approved", "rejected", "timeout"]] = None
     start_date: Optional[str] = None  # YYYY-MM-DD
     end_date: Optional[str] = None

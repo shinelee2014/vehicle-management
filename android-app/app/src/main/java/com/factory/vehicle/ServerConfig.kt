@@ -12,7 +12,7 @@ class ServerConfig(context: Context) {
     private val prefs: SharedPreferences =
         context.applicationContext.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
 
-    /** 后端 API 基础地址，例如 http://192.168.6.12:8080 */
+    /** 后端 API 基础地址，例如 http://192.168.1.100:8080 */
     var baseUrl: String
         get() = prefs.getString(KEY_BASE_URL, DEFAULT_BASE_URL) ?: DEFAULT_BASE_URL
         set(value) = prefs.edit().putString(KEY_BASE_URL, value).apply()
@@ -54,6 +54,6 @@ class ServerConfig(context: Context) {
         private const val KEY_POST_ID = "post_id"
 
         /** 默认值指向部署好的 NAS，用户首次启动可改 */
-        const val DEFAULT_BASE_URL = "http://192.168.6.12:8080"
+        const val DEFAULT_BASE_URL = "http://192.168.1.100:8080"
     }
 }

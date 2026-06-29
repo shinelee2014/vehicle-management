@@ -262,7 +262,7 @@ INSERT INTO `system_configs` (`config_key`, `config_value`, `description`) VALUE
 ('photo_quality', '85', '照片压缩质量（1-100）'),
 ('login_max_attempts', '5', '登录最大失败次数'),
 ('login_lockout_minutes', '15', '登录锁定时间（分钟）'),
-('company_name', 'YUSEI 模具注塑', '公司名称（用于报表抬头）');
+('company_name', '模具注塑', '公司名称（用于报表抬头）');
 
 -- 定时推送配置
 INSERT INTO `report_configs` (`name`, `frequency`, `run_time`, `run_weekday`, `recipients`, `enabled`) VALUES

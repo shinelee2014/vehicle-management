@@ -12,9 +12,9 @@ from sqlalchemy import text
 
 from app.config import settings
 from app.database import engine, SessionLocal
-from app.api import auth, users, posts, records, files, messages, dashboard, approvers, reports, configs, report_configs, audit_logs, role_modules, modules
+from app.api import auth, users, posts, records, files, messages, dashboard, approvers, reports, configs, report_configs, audit_logs, role_modules, modules, vehicle_types
 from app.core.security import hash_password
-from app.services.bootstrap import ensure_default_passwords, ensure_default_role_modules, ensure_builtin_modules
+from app.services.bootstrap import ensure_default_passwords, ensure_default_role_modules, ensure_builtin_modules, ensure_default_vehicle_types
 from app.services.scheduler import start_scheduler, stop_scheduler
 
 # 日志
@@ -39,12 +39,23 @@ async def lifespan(app: FastAPI):
         logger.error(f"✗ 数据库连接失败: {e}")
         raise
 
+    # 自动创建缺失的数据库表
+    from app.database import Base
+    from app.models.vehicle_type import VehicleType
+    try:
+        Base.metadata.create_all(bind=engine)
+        logger.info("✓ 数据库表同步成功")
+    except Exception as e:
+        logger.error(f"✗ 数据库表同步失败: {e}")
+        raise
+
     # 重置默认密码 + 写入内置模块 + 默认角色模块权限（首次启动时）
     db = SessionLocal()
     try:
         ensure_default_passwords(db)
         ensure_builtin_modules(db)
         ensure_default_role_modules(db)
+        ensure_default_vehicle_types(db)
     finally:
         db.close()
 
@@ -121,6 +132,7 @@ app.include_router(report_configs.router, prefix="/api/v1/report-configs", tags=
 app.include_router(audit_logs.router, prefix="/api/v1/audit-logs", tags=["审计日志"])
 app.include_router(role_modules.router, prefix="/api/v1/role-modules", tags=["角色权限"])
 app.include_router(modules.router, prefix="/api/v1/modules", tags=["自定义模块"])
+app.include_router(vehicle_types.router, prefix="/api/v1/vehicle-types", tags=["车辆类型"])
 
 
 # 照片静态目录（upload_photo 返回的 /photos/{rel_path} 在这里 serve）

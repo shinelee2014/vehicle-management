@@ -58,6 +58,16 @@ def ensure_builtin_modules(db: Session) -> None:
 def ensure_default_role_modules(db: Session) -> None:
     """首次启动时，给所有内置角色写入默认可见模块；
     已有配置的角色不会被覆盖（admin 可以到「角色权限」页调整）"""
+    # 自动升级：若 admin 角色已经配置了，但缺失新加的模块权限，进行追加
+    admin_rm = db.query(RoleModule).filter(RoleModule.role == "admin").first()
+    if admin_rm and isinstance(admin_rm.modules, list):
+        if "admin_vehicle_types" not in admin_rm.modules:
+            updated_modules = list(admin_rm.modules)
+            updated_modules.append("admin_vehicle_types")
+            admin_rm.modules = updated_modules
+            db.commit()
+            logger.info("✓ 自动升级：已为管理员 admin 追加 '车辆类型' 模块权限")
+
     added = 0
     for role, modules in DEFAULT_ROLE_MODULES.items():
         if db.query(RoleModule).filter(RoleModule.role == role).first():
@@ -75,6 +85,33 @@ def ensure_default_role_modules(db: Session) -> None:
     if added:
         logger.info(f"✓ 初始化 {added} 个角色的默认模块权限")
         db.commit()
+
+
+def ensure_default_vehicle_types(db: Session) -> None:
+    """初始化车辆类型默认数据（若表为空）"""
+    from app.models.vehicle_type import VehicleType
+    
+    defaults = [
+        {"code": "internal", "name": "内部车", "description": "系统预置：内部通行车辆"},
+        {"code": "external", "name": "外部车", "description": "系统预置：外部来访车辆"},
+        {"code": "truck", "name": "货车", "description": "系统预置：载货卡车，需登记货物"},
+    ]
+    added = 0
+    for item in defaults:
+        existing = db.query(VehicleType).filter(VehicleType.code == item["code"]).first()
+        if existing:
+            continue
+        try:
+            db.add(VehicleType(**item, is_active=True))
+            db.flush()
+            added += 1
+        except IntegrityError:
+            db.rollback()
+            continue
+    if added:
+        logger.info(f"✓ 初始化 {added} 个系统默认车辆类型")
+        db.commit()
+
 
 
 

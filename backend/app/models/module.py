@@ -35,6 +35,7 @@ BUILTIN_MODULES = [
     {"code": "admin_posts", "name": "岗亭管理", "description": "管理岗亭", "category": "管理", "path": "/admin/posts", "icon": "OfficeBuilding", "sort_order": 110},
     {"code": "admin_configs", "name": "系统配置", "description": "系统参数配置", "category": "管理", "path": "/admin/configs", "icon": "Tools", "sort_order": 120},
     {"code": "admin_role_modules", "name": "角色权限", "description": "配置角色可见的功能模块", "category": "管理", "path": "/admin/role-modules", "icon": "Lock", "sort_order": 130},
+    {"code": "admin_vehicle_types", "name": "车辆类型", "description": "配置车辆类型及是否启用", "category": "管理", "path": "/admin/vehicle-types", "icon": "List", "sort_order": 140},
 ]
 
 
