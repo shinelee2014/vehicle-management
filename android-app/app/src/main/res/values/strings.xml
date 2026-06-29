@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<resources>
-    <string name="app_name">厂区车辆登记</string>
-    <string name="settings_title">服务器设置</string>
-    <string name="settings_server_url_hint">后端服务器地址（局域网内 NAS IP）</string>
-    <string name="settings_account_info">账号信息</string>
-    <string name="settings_about">车辆进出管理系统 v1.0.0\n部署于厂区 NAS，支持离线 WebView 加载</string>
-</resources>
